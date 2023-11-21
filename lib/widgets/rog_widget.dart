@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CardWidget extends StatelessWidget {
+import '../screens/medicines_screen.dart';
+
+class RogWidget extends StatelessWidget {
   final String? name;
-  const CardWidget({
+  const RogWidget({
     this.name,
     Key? key,
   }) : super(key: key);
@@ -11,11 +13,7 @@ class CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Hello bhadwe'),
-          ),
-        );
+        Navigator.pushNamed(context, MedicinesScreen().route);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
