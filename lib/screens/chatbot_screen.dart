@@ -1,15 +1,17 @@
 import 'dart:async';
 
 import 'package:ayurvedic_medicine/consts.dart';
+import 'package:ayurvedic_medicine/providers/message_history.dart';
 import 'package:ayurvedic_medicine/screens/medicines_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:provider/provider.dart';
 
 class ChatbotScreen extends StatefulWidget {
   ChatbotScreen({super.key});
 
-  String route = '/chatbot';
+  static String route = '/chatbot';
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
@@ -27,13 +29,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final ChatUser _currentUser = ChatUser(id: '1');
   final ChatUser _gptChatUser = ChatUser(id: '2');
 
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-        user: ChatUser(id: '2'),
-        createdAt: DateTime.now(),
-        text: "Hi, I am a Ayu-veer. I am here to help you."),
-  ];
-
   List<ChatUser> _typingUsers = [];
 
   @override
@@ -46,25 +41,32 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           currentUser: _currentUser,
           typingUsers: _typingUsers,
           messageOptions: const MessageOptions(
-            currentUserContainerColor: Colors.yellow,
-            currentUserTextColor: Colors.black,
-            containerColor: Colors.blue,
-            textColor: Colors.black,
+            currentUserContainerColor: Colors.purple,
+            currentUserTextColor: Colors.white,
+            containerColor: Colors.deepPurple,
+            textColor: Colors.white,
+            showOtherUsersAvatar: false,
           ),
           onSend: (ChatMessage m) {
             getChatResponse(m);
           },
-          messages: _messages),
+          messages:
+              Provider.of<MessageHistory>(context, listen: false).messages),
     );
   }
 
   Future<void> getChatResponse(ChatMessage message) async {
     setState(() {
-      _messages.insert(0, message);
+      Provider.of<MessageHistory>(context, listen: false)
+          .insertMessage(0, message);
       _typingUsers.add(_gptChatUser);
     });
 
-    List<Messages> _messagesHistory = _messages.reversed.map(
+    List<Messages> _messagesHistory =
+        Provider.of<MessageHistory>(context, listen: false)
+            .messages
+            .reversed
+            .map(
       (m) {
         if (m.user == _currentUser) {
           return Messages(role: Role.user, content: m.text);
@@ -121,6 +123,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           if (firstLine.contains('0') ||
               firstLine.contains('1') ||
               firstLine.contains('2') ||
+              firstLine.contains('3') ||
               firstLine.contains('-1') ||
               firstLine.contains('NO')) {
             for (int i = 1; i < lines.length; i++) {
@@ -134,7 +137,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           print("hello: $textByGPT");
 
           setState(() {
-            _messages.insert(
+            Provider.of<MessageHistory>(context, listen: false).insertMessage(
               0,
               ChatMessage(
                 user: _gptChatUser,
@@ -146,7 +149,23 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
           if (firstLine.contains('0')) {
             Timer(const Duration(seconds: 2), () {
-              Navigator.pushNamed(context, MedicinesScreen().route);
+              Navigator.pushNamed(context, MedicinesScreen.route,
+                  arguments: 'Dokedukhi');
+            });
+          } else if (firstLine.contains('1')) {
+            Timer(const Duration(seconds: 2), () {
+              Navigator.pushNamed(context, MedicinesScreen.route,
+                  arguments: 'Korda Khokla');
+            });
+          } else if (firstLine.contains('2')) {
+            Timer(const Duration(seconds: 2), () {
+              Navigator.pushNamed(context, MedicinesScreen.route,
+                  arguments: 'Sardi Khokla');
+            });
+          } else if (firstLine.contains('3')) {
+            Timer(const Duration(seconds: 2), () {
+              Navigator.pushNamed(context, MedicinesScreen.route,
+                  arguments: 'Potdukhi');
             });
           }
         } else {
@@ -159,7 +178,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       setState(() {
         _typingUsers.remove(_gptChatUser);
       });
-      SnackBar snackBar = const SnackBar(content: Text('Sorry, There is some issue please try again'));
+      print(e.toString());
+      SnackBar snackBar = const SnackBar(
+          content: Text('Sorry, There is some issue please try again'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 

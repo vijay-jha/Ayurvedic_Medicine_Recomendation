@@ -1,7 +1,10 @@
+import 'package:ayurvedic_medicine/providers/message_history.dart';
 import 'package:ayurvedic_medicine/screens/medicine_detail_screen.dart';
 import 'package:ayurvedic_medicine/screens/medicines_screen.dart';
+import 'package:ayurvedic_medicine/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 import './screens/homepage_screen.dart';
 import './screens/chatbot_screen.dart';
@@ -17,19 +20,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Ayu Veer',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider (
+      create: (ctx) => MessageHistory(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Ayu Veer',
+        theme: ThemeData(
+          primarySwatch: Colors.purple,
+        ),
+        initialRoute: SplashScreen.route,
+        routes: {
+          SplashScreen.route: (context) => const SplashScreen(),
+          HomepageScreen.route: (context) => HomepageScreen(),
+          ChatbotScreen.route: (context) => ChatbotScreen(),
+          MedicinesScreen.route: (context) => MedicinesScreen(),
+          MedicineDetailScreen.route: (context) => MedicineDetailScreen(),
+        },
       ),
-      initialRoute: HomepageScreen().route,
-      routes: {
-        HomepageScreen().route: (context) => HomepageScreen(),
-        ChatbotScreen().route: (context) => ChatbotScreen(),
-        MedicinesScreen().route: (context) => MedicinesScreen(),
-        MedicineDetailScreen().route: (context) => MedicineDetailScreen(),
-      },
     );
   }
 }
